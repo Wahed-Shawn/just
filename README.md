@@ -1,317 +1,285 @@
 ```
-1. Horner's Rule
-#include <iostream>
-using namespace std;
+1.DDA
+#include <stdio.h>
+#include <graphics.h>
+#include <conio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <dos.h>
+
+float round (float a);
+
+int main() {
+    int gd = DETECT,gm;
+    initgraph(&gd, &gm, "");
+
+    int x1,y1,x2,y2,steps,k;
+    float xincr,yincr,x,y,dx,dy;
+
+    scanf("%d%d", &x1,&y1);
+    scanf("%d%d", &x2,&y2);
+
+    dx = x2 - x1;
+    dy = y2 - y1;
+
+    if(abs(dx) > abs(dy))
+        steps = abs(dx);
+    else
+        steps = abs(dy);
+
+    xincr = dx/steps;
+    yincr = dy/steps;
+
+    x = x1;
+    y = y1;
+
+
+    for(k = 1; k <= steps; k++){
+        delay(10);
+        x += xincr;
+        y += yincr;
+        putpixel(round(x),round(y), WHITE);
+    }
+    outtextxy(200,200, "DDA");
+    outtextxy(x1+5,y1-5, "(x1,y1)");
+    outtextxy(x2+5,y2-5, "(x2,y2)");
+
+    getch();
+    closegraph();
+    return 0;
+}
+
+     float round(float a){
+        int b = a + 0.5;
+        return b;
+    }
+
+
+2.Bressenham line drawing
+#include <stdio.h>
+#include <graphics.h>
+#include <conio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <dos.h>
+
+float round (float a);
+
+int main() {
+    int gd = DETECT,gm;
+    initgraph(&gd, &gm, "");
+
+    int x,y,x1,y1,x2,y2,p,dx,dy;
+    scanf("%d%d",&x1,&y1);
+    scanf("%d%d",&x2,&y2);
+
+    x = x1;
+    y = y1; 
+
+    dx = x2 - x1;
+    dy = y2 - y1;
+
+    putpixel(x,y,2);
+    p = (2*dy - dx);
+
+    while(x <= x2){
+        if(p < 0){
+            x = x + 1;
+            p = p + 2 * dy;
+        }
+
+        else{
+            x = x+1;
+            y = y+1;
+            p = p + 2*(dy - dx);
+        }
+        putpixel(x,y,7);
+    }
+   
+    getch();
+    closegraph();
+    return 0;
+}
+
+3.Mid point circle 
+#include <stdio.h>
+#include <graphics.h>
+#include <conio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <dos.h>
+
+void draw_circle(int xc, int yc, int r);
+void symmetry(int xc, int yc, int x, int y);
+
+float round (float a);
+
+int main() {
+    int gd = DETECT,gm;
+    initgraph(&gd, &gm, "");
+
+    int xc,yc, r;
+    scanf ("%d%d%d", &xc,&yc,&r);
+
+    draw_circle(xc,yc,r);
+   
+    getch();
+    closegraph();
+    return 0;
+}
+
+void draw_circle(int xc, int yc, int r){
+    int x = 0;
+    int y = r;
+    int p = 1 - r;
+
+    symmetry(xc,yc,x,y);
+
+    while(x < y){
+        x++;
+
+        if(p < 0){
+            p = p + 2*x + 3;
+        }
+        else {
+            y--;
+            p = p + 2*(x-y) + 5;
+        }
+        symmetry(xc,yc,x,y);
+    }
+}
+
+void symmetry(int xc, int yc, int x, int y){
+    putpixel(xc+x,yc+y,GREEN);
+    putpixel(xc-x,yc+y,GREEN);
+    putpixel(xc+x,yc-y,GREEN);
+    putpixel(xc-x,yc-y,GREEN);
+    putpixel(xc+y,yc+x,GREEN);
+    putpixel(xc-y,yc+x,GREEN);
+    putpixel(xc+y,yc-x,GREEN);
+    putpixel(xc-y,yc-x,GREEN);
+}
+
+4.Ellips generation algorithm
+#include <stdio.h>
+#include <graphics.h>
+#include <conio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <dos.h>
+
+
+void drawEllipse(int xc, int yc, int rx, int ry);
+
+int main() {
+    int gd = DETECT,gm;
+    initgraph(&gd, &gm, "");
+
+    int xc,yc,rx,ry;
+
+    scanf("%d%d%d%d", &xc,&yc,&rx,&ry);
+
+    drawEllipse(xc,yc,rx,ry);
+   
+    getch();
+    closegraph();
+    return 0;
+}
+
+void drawEllipse(int xc, int yc, int rx, int ry)
+{
+    float x = 0;
+    float y = ry;
+    float rx2 = rx * rx;
+    float ry2 = ry * ry;
+    float dx = 2 * ry2 * x;
+    float dy = 2 * rx2 * y;
+
+    float p1 = ry2 - (rx2 * ry) + (0.25 * rx2);
+
+    while (dx < dy)
+    {
+        putpixel(xc + x, yc + y, WHITE);
+        putpixel(xc - x, yc + y, WHITE);
+        putpixel(xc + x, yc - y, WHITE);
+        putpixel(xc - x, yc - y, WHITE);
+
+        if (p1 < 0)
+        {
+            x++;
+            dx = dx + (2 * ry2);
+            p1 = p1 + dx + ry2;
+        }
+        else
+        {
+            x++;
+            y--;
+            dx = dx + (2 * ry2);
+            dy = dy - (2 * rx2);
+            p1 = p1 + dx - dy + ry2;
+        }
+    }
+
+    float p2 = ry2 * (x + 0.5) * (x + 0.5)
+             + rx2 * (y - 1) * (y - 1)
+             - rx2 * ry2;
+
+    while (y >= 0)
+    {
+        putpixel(xc + x, yc + y, WHITE);
+        putpixel(xc - x, yc + y, WHITE);
+        putpixel(xc + x, yc - y, WHITE);
+        putpixel(xc - x, yc - y, WHITE);
+
+        if (p2 > 0)
+        {
+            y--;
+            dy = dy - (2 * rx2);
+            p2 = p2 + rx2 - dy;
+        }
+        else
+        {
+            y--;
+            x++;
+            dx = dx + (2 * ry2);
+            dy = dy - (2 * rx2);
+            p2 = p2 + dx - dy + rx2;
+        }
+    }
+}
+
+5.Create various types of text and fonts
+#include <stdio.h>
+#include <graphics.h>
+#include <conio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <dos.h>
 
 
 int main() {
-    int n;
-    cout << "Degree of polynomial: ";
-    cin >> n;
+    int gd = DETECT,gm;
+    initgraph(&gd, &gm, "");
 
-    if (n < 0 || n > 99) {
-        cout << "Invalid degree!\n";
-        return 0;
+    int x = 50, y = 50;
+
+    for(int font = 0; font <= 4; font++){
+        settextstyle(font, HORIZ_DIR, 1 + font);
+        setcolor(font + 1);
+        outtextxy(x,y,"Text with different fonts");
+        y += 50;
     }
 
-    double a[100];
-    cout << "Coefficients (highest to lowest):\n";
-    for (int i = 0; i <= n; i++) cin >> a[i];
-
-    double x;
-    cout << "Value of x: ";
-    cin >> x;
-
-    double result = a[0];
-    for (int i = 1; i <= n; i++)
-        result = result * x + a[i];
-
-    cout << "f(" << x << ") = " << result << endl;
-}
-
-2. Banker's Rounding
-#include <iostream>
-#include <iomanip>
-#include <cmath>
-#include <cfenv>
-using namespace std;
-
-int main() {
-    long double x;
-    int n;
-
-    cout << "Enter number: ";
-    cin >> x;
-
-    cout << "Enter significant digits: ";
-    cin >> n;
-
-    if (n < 1) {
-        cout << "Invalid digits!\n";
-        return 0;
+    x = 500, y = 80;
+    for( font = 0; font <= 2; font++){
+        settextstyle(font,VERT_DIR, 1+font);
+        setcolor(font+1);
+        outtextxy(x,y, "Vertical texr");
+        x += 50;
     }
-
-    if (x == 0) {
-        cout << "Rounded value: 0\n";
-        return 0;
-    }
-
-    fesetround(FE_TONEAREST); // banker's rounding (round to nearest even)
-
-    int p = floor(log10(fabsl(x)));          // exponent
-    long double factor = pow(10.0L, n - 1 - p);
-    long double ans = nearbyintl(x * factor) / factor;
-
-    cout << "Rounded value: " << setprecision(n) << ans << endl;
-}
-
-
-3. Bisection Method
-#include <iostream>
-#include <iomanip>
-using namespace std;
-
-double f(double x) {
-    return x * x * x - x - 1;
-}
-
-int main() {
-    double a, b, e;
-
-    cout << "Enter a, b: ";
-    cin >> a >> b;
-
-    cout << "Enter tolerance: ";
-    cin >> e;
-
-    if (e <= 0) {
-        cout << "Invalid tolerance!\n";
-        return 0;
-    }
-
-    if (a > b) {
-        double t = a;
-        a = b;
-        b = t;
-    }
-
-    double fa = f(a), fb = f(b);
-    cout << setprecision(12);
-
-    if (fa == 0) {
-        cout << "Root = " << a << endl;
-        return 0;
-    }
-
-    if (fb == 0) {
-        cout << "Root = " << b << endl;
-        return 0;
-    }
-
-    if ((fa > 0 && fb > 0) || (fa < 0 && fb < 0)) {
-        cout << "No root is bracketed in this interval.\n";
-        return 0;
-    }
-
-    int i = 0;
-    while (b - a > e && i < 1000) {
-        double mid = (a + b) / 2;
-        double fm = f(mid);
-        i++;
-
-        if (fm == 0) {
-            a = b = mid;
-            break;
-        }
-
-        if ((fa > 0 && fm > 0) || (fa < 0 && fm < 0)) {
-            a = mid;
-            fa = fm;
-        } else {
-            b = mid;
-        }
-    }
-
-    cout << "Approximate root = " << (a + b) / 2 << endl;
-
-    if (b - a > e)
-        cout << "Tolerance not reached within 1000 iterations.\n";
-}
-
-
-4. Newton-Raphson Method
-#include <iostream>
-#include <cmath>
-using namespace std;
-
-double f(double x) {
-    return x * x * x - x - 1;
-}
-
-double df(double x) {
-    return 3 * x * x - 1;
-}
-
-int main() {
-    double x0, e;
-
-    cout << "Initial guess: ";
-    cin >> x0;
-
-    cout << "Tolerance: ";
-    cin >> e;
-
-    if (e <= 0) {
-        cout << "Invalid tolerance!\n";
-        return 0;
-    }
-
-    for (int i = 0; i < 1000; i++) {
-        if (fabs(f(x0)) < e) {
-            cout << "Root = " << x0 << endl;
-            return 0;
-        }
-
-        double derivative = df(x0);
-
-        if (fabs(derivative) < 1e-12) {
-            cout << "Derivative is zero. Method stopped.\n";
-            return 0;
-        }
-
-        double x1 = x0 - f(x0) / derivative;
-
-        if (!isfinite(x1)) {
-            cout << "Method failed to converge.\n";
-            return 0;
-        }
-
-        if (fabs(x1 - x0) < e || fabs(f(x1)) < e) {
-            cout << "Root = " << x1 << endl;
-            return 0;
-        }
-
-        x0 = x1;
-    }
-
-    cout << "Approximate root = " << x0 << endl;
-    cout << "Maximum iterations reached.\n";
-}
-
-
-5. Newton Forward Interpolation
-#include <iostream>
-#include <cmath>
-using namespace std;
-
-int main() {
-    int n;
-    cout << "Number of points: ";
-    cin >> n;
-
-    if (n < 2 || n > 50) {
-        cout << "Invalid number of points!\n";
-        return 0;
-    }
-
-    double x[50], y[50], d[50][50];
-
-    cout << "Enter x and y:\n";
-    for (int i = 0; i < n; i++)
-        cin >> x[i] >> y[i];
-
-    double h = x[1] - x[0];
-
-    if (fabs(h) < 1e-12) {
-        cout << "Invalid x values!\n";
-        return 0;
-    }
-
-    for (int i = 2; i < n; i++) {
-        if (fabs((x[i] - x[i - 1]) - h) > 1e-8) {
-            cout << "x values must be equally spaced!\n";
-            return 0;
-        }
-    }
-
-    // Forward difference table
-    for (int i = 0; i < n; i++)
-        d[i][0] = y[i];
-
-    for (int j = 1; j < n; j++)
-        for (int i = 0; i < n - j; i++)
-            d[i][j] = d[i + 1][j - 1] - d[i][j - 1];
-
-    double xv;
-    cout << "Interpolate at x = ";
-    cin >> xv;
-
-    double u = (xv - x[0]) / h;
-    double sum = y[0], term = 1;
-
-    for (int i = 1; i < n; i++) {
-        term = term * (u - (i - 1)) / i;
-        sum = sum + term * d[0][i];
-    }
-
-    cout << "f(" << xv << ") = " << sum << endl;
-}
-
-
-6. Newton Divided Difference
-#include <iostream>
-#include <cmath>
-using namespace std;
-
-int main() {
-    int n;
-    cout << "Number of points: ";
-    cin >> n;
-
-    if (n < 2 || n > 50) {
-        cout << "Invalid number of points!\n";
-        return 0;
-    }
-
-    double x[50], y[50], d[50][50];
-
-    cout << "Enter x and y:\n";
-    for (int i = 0; i < n; i++)
-        cin >> x[i] >> y[i];
-
-    // Check for duplicate x values
-    for (int i = 0; i < n; i++) {
-        for (int j = i + 1; j < n; j++) {
-            if (fabs(x[i] - x[j]) < 1e-12) {
-                cout << "All x values must be distinct!\n";
-                return 0;
-            }
-        }
-    }
-
-    // Divided difference table
-    for (int i = 0; i < n; i++)
-        d[i][0] = y[i];
-
-    for (int j = 1; j < n; j++) {
-        for (int i = 0; i < n - j; i++) {
-            d[i][j] =
-                (d[i + 1][j - 1] - d[i][j - 1])
-                / (x[i + j] - x[i]);
-        }
-    }
-
-    double xv;
-    cout << "Interpolate at x = ";
-    cin >> xv;
-
-    double sum = d[0][0], term = 1;
-
-    for (int i = 1; i < n; i++) {
-        term = term * (xv - x[i - 1]);
-        sum = sum + term * d[0][i];
-    }
-
-    cout << "f(" << xv << ") = " << sum << endl;
+   
+    getch();
+    closegraph();
+    return 0;
 }
 ```
